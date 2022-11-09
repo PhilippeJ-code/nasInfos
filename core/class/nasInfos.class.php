@@ -81,17 +81,6 @@
         $obj->setType('action');
         $obj->setSubType('other');
         $obj->save();
-
-        $obj = $this->getCmd(null, 'refresh');
-        if (!is_object($obj)) {
-            $obj = new nasInfosCmd();
-            $obj->setName(__('Rafraichir', __FILE__));
-        }
-        $obj->setEqLogic_id($this->getId());
-        $obj->setLogicalId('refresh');
-        $obj->setType('action');
-        $obj->setSubType('other');
-        $obj->save();
          
     }
 
@@ -108,7 +97,6 @@
     {
         
     }
-
 
   }
   
