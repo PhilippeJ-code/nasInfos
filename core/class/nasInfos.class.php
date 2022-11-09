@@ -16,61 +16,122 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-  require_once __DIR__  . '/../../../../core/php/core.inc.php';
+require_once __DIR__  . '/../../../../core/php/core.inc.php';
 
-  class nasInfos extends eqLogic 
-  {
+class nasInfos extends eqLogic
+{
+    // Statut des dépendances
+    //
+    public static function dependancy_info()
+    {
+        $return = array();
+        $return['log'] = 'nasInfos_dep';
+        $cmd = "dpkg -l php*-snmp*| grep snmp";
+        exec($cmd, $output, $returnVar);
+        if ($output[0] != "") {
+            $return['state'] = 'ok';
+        } else {
+            $return['state'] = 'nok';
+        }
+        return $return;
+    }
+
+    // Installation des dépendances
+    //
+    public function dependancy_install()
+    {
+        log::add('nasInfos', 'info', 'Installation des dependances php-snmp');
+        passthru('sudo apt install php-snmp -y >> ' . log::getPathToLog('printerStatus_dep') . ' 2>&1 &');
+    }
+
     public function rafraichir()
     {
         return;
     }
 
+    public static function periodique()
+    {
+        foreach (self::byType('nasInfos') as $nasInfos) {
+            if ($nasInfos->getIsEnable() == 1) {
+                $cmd = $nasInfos->getCmd(null, 'refresh');
+                if (!is_object($cmd)) {
+                    continue;
+                }
+                $cmd->execCmd();
+            }
+        }
+    }
+
     public static function cron()
     {
+        self::periodique();
+    }
+  
+    public static function cron5()
+    {
+        self::periodique();
+    }
+  
+    public static function cron10()
+    {
+        self::periodique();
+    }
+  
+    public static function cron15()
+    {
+        self::periodique();
+    }
+  
+    public static function cron30()
+    {
+        self::periodique();
+    }
+  
+    public static function cronHourly()
+    {
+        self::periodique();
+    }
+  
+    public static function cronDaily()
+    {
+        self::periodique();
     }
 
 
-    
-    // Fonction exécutée automatiquement avant la création de l'équipement 
+    // Fonction exécutée automatiquement avant la création de l'équipement
     //
-    public function preInsert() 
+    public function preInsert()
     {
-        
     }
 
-    // Fonction exécutée automatiquement après la création de l'équipement 
+    // Fonction exécutée automatiquement après la création de l'équipement
     //
-    public function postInsert() 
+    public function postInsert()
     {
-        
     }
 
-    // Fonction exécutée automatiquement avant la mise à jour de l'équipement 
+    // Fonction exécutée automatiquement avant la mise à jour de l'équipement
     //
-    public function preUpdate() 
+    public function preUpdate()
     {
-        
     }
 
-    // Fonction exécutée automatiquement après la mise à jour de l'équipement 
+    // Fonction exécutée automatiquement après la mise à jour de l'équipement
     //
-    public function postUpdate() 
+    public function postUpdate()
     {
-    
     }
 
-    // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement 
+    // Fonction exécutée automatiquement avant la sauvegarde (création ou mise à jour) de l'équipement
     //
-    public function preSave() 
+    public function preSave()
     {
-        
     }
 
-    // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement 
+    // Fonction exécutée automatiquement après la sauvegarde (création ou mise à jour) de l'équipement
     //
-    public function postSave() 
+    public function postSave()
     {
-
         $obj = $this->getCmd(null, 'refresh');
         if (!is_object($obj)) {
             $obj = new nasInfosCmd();
@@ -81,32 +142,27 @@
         $obj->setType('action');
         $obj->setSubType('other');
         $obj->save();
-         
     }
 
-    // Fonction exécutée automatiquement avant la suppression de l'équipement 
+    // Fonction exécutée automatiquement avant la suppression de l'équipement
     //
-    public function preRemove() 
+    public function preRemove()
     {
-        
     }
 
-    // Fonction exécutée automatiquement après la suppression de l'équipement 
+    // Fonction exécutée automatiquement après la suppression de l'équipement
     //
-    public function postRemove() 
+    public function postRemove()
     {
-        
     }
+}
 
-  }
-  
-  class nasInfosCmd extends cmd 
-  {
-    // Exécution d'une commande  
+class nasInfosCmd extends cmd
+{
+    // Exécution d'une commande
     //
-    public function execute($_options = array()) 
+    public function execute($_options = array())
     {
-
         $eqlogic = $this->getEqLogic();
         switch ($this->getLogicalId()) {
             case 'refresh':
@@ -114,5 +170,4 @@
                 break;
         }
     }
-
-  }
+}
