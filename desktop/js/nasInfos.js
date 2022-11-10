@@ -15,6 +15,7 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
+var eqLogicId = -1;
 
 $("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
 /*
@@ -31,6 +32,11 @@ function addCmdToTable(_cmd) {
     tr += '<td>';
     tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
     tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom}}">';
+    tr += '</td>';
+    tr += '<td>';
+    if ((_cmd.logicalId!='refresh') && (_cmd.logicalId!='state')) {
+        tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration"  data-l2key="oid" style="width : 200px;" placeholder="{{OID}}" title="{{OID}}" >';
+    }
     tr += '</td>';
     tr += '<td>';
     tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
@@ -55,3 +61,65 @@ function addCmdToTable(_cmd) {
     }
     jeedom.cmd.changeType($('#table_cmd tbody tr:last'), init(_cmd.subType));
 }
+
+function printEqLogic(_eqLogic) {   
+    eqLogicId = _eqLogic.id;
+}
+
+// Click pour importation
+//
+$('#idImporter').on('click', function () {
+
+    $.ajax({
+        type: "POST",
+        url: "plugins/nasInfos/core/ajax/nasInfos.ajax.php",
+        data: {
+            action: "importer",
+            id: eqLogicId,
+            nomNas: $('#idListeNas option:selected').text()
+        },
+        dataType: 'json',
+        global: false,
+        async: false,
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({ message: data.result, level: 'danger' });
+                return;
+            }
+            location.reload();
+        },
+    });
+
+});
+
+// Click pour exportation
+//
+$('#idExporter').on('click', function () {
+
+    $.ajax({
+        type: "POST",
+        url: "plugins/nasInfos/core/ajax/nasInfos.ajax.php",
+        data: {
+            action: "exporter",
+            id: eqLogicId,
+            nomNas: $('#idNomNas').val()
+        },
+        dataType: 'json',
+        global: false,
+        async: false,
+        error: function (request, status, error) {
+            handleAjaxError(request, status, error);
+        },
+        success: function (data) {
+            if (data.state != 'ok') {
+                $('#div_alert').showAlert({ message: data.result, level: 'danger' });
+                return;
+            }
+            location.reload();
+        },
+    });
+
+});

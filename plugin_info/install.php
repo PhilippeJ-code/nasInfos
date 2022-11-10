@@ -22,12 +22,50 @@ require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 //
 function nasInfos_install() 
 {
+    config::save('functionality::cron::enable', 0, 'nasInfos');
+    config::save('functionality::cron5::enable', 0, 'nasInfos');
+    config::save('functionality::cron10::enable', 0, 'nasInfos');
+    config::save('functionality::cron15::enable', 0, 'nasInfos');
+    config::save('functionality::cron30::enable', 1, 'nasInfos');
+    config::save('functionality::cronHourly::enable', 0, 'nasInfos');
+    config::save('functionality::cronDaily::enable', 0, 'nasInfos');
 }
 
 // Fonction exécutée automatiquement après la mise à jour du plugin
 //
 function nasInfos_update() 
 {
+    if (config::byKey('functionality::cron::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cron::enable', 0, 'nasInfos');
+    }
+
+    if (config::byKey('functionality::cron5::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cron5::enable', 0, 'nasInfos');
+    }
+
+    if (config::byKey('functionality::cron10::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cron10::enable', 0, 'nasInfos');
+    }
+
+    if (config::byKey('functionality::cron15::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cron15::enable', 0, 'nasInfos');
+    }
+
+    if (config::byKey('functionality::cron30::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cron30::enable', 1, 'nasInfos');
+    }
+
+    if (config::byKey('functionality::cronHourly::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cronHourly::enable', 0, 'nasInfos');
+    }
+
+    if (config::byKey('functionality::cronDaily::enable', 'nasInfos', -1) == -1) {
+        config::save('functionality::cronDaily::enable', 0, 'nasInfos');
+    }
+
+    foreach (nasInfos::byType('nasInfos') as $nasInfos) {
+        $nasInfos->save();
+    }
 }
 
 // Fonction exécutée automatiquement après la suppression du plugin

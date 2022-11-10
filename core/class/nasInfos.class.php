@@ -46,7 +46,93 @@ class nasInfos extends eqLogic
 
     public function rafraichir()
     {
-        return;
+        $adresseIp = $this->getConfiguration('adresse_ip', '');
+        $community = $this->getConfiguration('community', '');
+
+        if (($adresseIp === '') || (community === '')) {
+            return;
+        }
+
+        $ping_check=exec('/bin/ping -c2 -q -w2 '.$adresseIp.' | grep transmitted | cut -f3 -d"," | cut -f1 -d"," | cut -f1 -d"%"');
+        if ($ping_check != 0) {
+            $this->getCmd(null, 'state')->event('Hors ligne');
+            return;
+        } else {
+            $this->getCmd(null, 'state')->event('En ligne');
+        }
+
+        try {
+            snmp_set_valueretrieval(SNMP_VALUE_PLAIN);
+            foreach ($this->getCmd('info') as $cmd) {
+                $logicalId = $cmd->getLogicalId();
+                if (($logicalId != 'refresh') && ($logicalId != 'state')) {
+                    $oid = $cmd->getConfiguration('oid', '');
+                    if ($oid !== '') {
+                        $value = snmp2_get($adresseIp, $community, $oid, 200000, 1);
+                        $cmd->event($value);
+                    }
+                }
+            }
+        } catch (Throwable $t) {
+            log::add('nasInfos', 'error', $t->getMessage());
+        } catch (Exception $e) {
+            log::add('nasInfos', 'error', $e->getMessage());
+        }
+
+            return;
+    }
+
+    public function importer($nomNas)
+    {
+        $array = array();
+
+        $json_file = __DIR__ . '/../../data/'.$nomNas.'.json';
+
+        $string = file_get_contents($json_file);
+        $array = json_decode($string, true);
+
+        foreach ($this->getCmd('info') as $cmd) {
+            $logicalId = $cmd->getLogicalId();
+            if (($logicalId != 'refresh') && ($logicalId != 'state')) {
+                $cmd->remove();
+            }
+        }
+        
+        $n = count($array);
+        for ($i=0; $i<$n; $i++) {
+
+            $obj = new nasInfosCmd();
+            $obj->setName($array[$i]['name']);            
+            $obj->setEqLogic_id($this->getId());
+            $obj->setConfiguration('oid',$array[$i]['oid']);
+            $obj->setType('info');
+            $obj->setSubType($array[$i]['subType']);
+            $obj->save();
+        
+        }
+
+        $this->save();
+
+        return $array;
+    }
+
+    public function exporter($nomNas)
+    {
+        $array = array();
+
+        $json_file = __DIR__ . '/../../data/'.$nomNas.'.json';
+
+        foreach ($this->getCmd('info') as $cmd) {
+            $logicalId = $cmd->getLogicalId();
+            if (($logicalId != 'refresh') && ($logicalId != 'state')) {
+                $array[] = array('name'=>$cmd->getName(),'oid'=>$cmd->getConfiguration('oid', ''),'subType'=>$cmd->getSubType());
+            }
+        }
+
+        $json = json_encode($array, JSON_PRETTY_PRINT);
+        file_put_contents($json_file, $json);
+
+        return array();
     }
 
     public static function periodique()
@@ -66,32 +152,32 @@ class nasInfos extends eqLogic
     {
         self::periodique();
     }
-  
+
     public static function cron5()
     {
         self::periodique();
     }
-  
+
     public static function cron10()
     {
         self::periodique();
     }
-  
+
     public static function cron15()
     {
         self::periodique();
     }
-  
+
     public static function cron30()
     {
         self::periodique();
     }
-  
+
     public static function cronHourly()
     {
         self::periodique();
     }
-  
+
     public static function cronDaily()
     {
         self::periodique();
@@ -141,6 +227,19 @@ class nasInfos extends eqLogic
         $obj->setLogicalId('refresh');
         $obj->setType('action');
         $obj->setSubType('other');
+        $obj->save();
+
+        $obj = $this->getCmd(null, 'state');
+        if (!is_object($obj)) {
+            $obj = new nasInfosCmd();
+            $obj->setName(__('Etat', __FILE__));
+            $obj->setIsVisible(1);
+            $obj->setIsHistorized(0);
+        }
+        $obj->setEqLogic_id($this->getId());
+        $obj->setType('info');
+        $obj->setSubType('string');
+        $obj->setLogicalId('state');
         $obj->save();
     }
 

@@ -26,13 +26,25 @@ try
         throw new Exception(__('401 - Accès non autorisé', __FILE__));
     }
     
-    /* 
-        Fonction permettant l'envoi de l'entête 'Content-Type: application/json'
-        En V3 : indiquer l'argument 'true' pour contrôler le token d'accès Jeedom
-        En V4 : autoriser l'exécution d'une méthode 'action' en GET en indiquant le(s) nom(s) de(s) action(s) dans un tableau en argument
-    */  
-
     ajax::init();
+
+    if (init('action') == 'importer') {
+        $eqLogic = nasInfos::byId(init('id'));
+        if (!is_object($eqLogic)) {
+            throw new Exception(__('Equipement non trouvé : ', __FILE__) . init('id'));
+        } else {
+            ajax::success($eqLogic->importer(init('nomNas')));
+        }
+    }
+
+    if (init('action') == 'exporter') {
+        $eqLogic = nasInfos::byId(init('id'));
+        if (!is_object($eqLogic)) {
+            throw new Exception(__('Equipement non trouvé : ', __FILE__) . init('id'));
+        } else {
+            ajax::success($eqLogic->exporter(init('nomNas')));
+        }
+    }
 
     throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
     /*     * *********Catch exception*************** */

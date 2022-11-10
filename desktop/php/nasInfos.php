@@ -104,6 +104,67 @@
 		          </div>
 	          </div>
 
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{Adresse IP du NAS}}</label>
+              <div class="col-sm-4">
+                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="adresse_ip"
+                  placeholder="{{Adresse IP}}" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{Communauté SNMP}}</label>
+              <div class="col-sm-4">
+                <input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="community"
+                  placeholder="{{Community}}" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{Importation}}</label>
+              <div class="col-sm-4">
+                <select class="configKey form-control" data-l1key="visuel" id="idListeNas">
+
+                  <?php
+
+                    $path = '/var/www/html/plugins/nasInfos/data/';
+                    $dp = opendir($path);
+                    $i=0;
+                    while ($file = readdir($dp)) {
+                        $len = strlen($file);
+                        if ($len > 5) {
+                            $ext = substr($file, $len-5, 5);
+                            if ($ext === '.json') {
+                                $template = substr($file, 0, $len-5);
+                                $ListTemplates[$i]=$template;
+                                $i++;
+                            }
+                        }
+                    }
+            
+                    closedir($dp);
+                    sort($ListTemplates);
+                    $i=0;
+                    while ($i < count($ListTemplates)) {
+                        echo '<option value="'.$ListTemplates[$i].'">'.$ListTemplates[$i].'</option>';
+                        $i++;
+                    }
+                  ?>
+                </select>
+              </div>
+              <div class="col-sm-4">
+                <a class="btn btn-primary" id="idImporter"><i class="fa fa-cloud-upload-alt"></i> {{Exécuter}}</a>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-sm-3 control-label">{{Exportation}}</label>
+              <div class="col-sm-4">
+                <input type="text" id="idNomNas" class="form-control" placeholder="{{Nom Nas}}" />
+              </div>
+              <div class="col-sm-4">
+                <a class="btn btn-primary" id="idExporter"><i class="fa fa-save"></i> {{Exécuter}}</a>
+              </div>
+            </div>
           </fieldset>
         </form>
       </div>
@@ -112,7 +173,7 @@
         <table id="table_cmd" class="table table-bordered table-condensed">
           <thead>
             <tr>
-              <th>{{Nom}}</th><th>{{Type}}</th><th>{{Action}}</th>
+              <th>{{Nom}}</th><th>{{Oid}}</th><th>{{Type}}</th><th>{{Action}}</th>
             </tr>
           </thead>
           <tbody>
