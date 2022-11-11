@@ -68,8 +68,10 @@ class nasInfos extends eqLogic
                 if (($logicalId != 'refresh') && ($logicalId != 'state')) {
                     $oid = $cmd->getConfiguration('oid', '');
                     if ($oid !== '') {
-                        $value = snmp2_get($adresseIp, $community, $oid, 200000, 1);
-                        $cmd->event($value);
+                        $value = snmp2_get($adresseIp, $community, $oid, 250000, 1);
+                        if ($value !== false) {
+                            $cmd->event($value);
+                        }
                     }
                 }
             }
@@ -97,18 +99,16 @@ class nasInfos extends eqLogic
                 $cmd->remove();
             }
         }
-        
+
         $n = count($array);
         for ($i=0; $i<$n; $i++) {
-
             $obj = new nasInfosCmd();
-            $obj->setName($array[$i]['name']);            
+            $obj->setName($array[$i]['name']);
             $obj->setEqLogic_id($this->getId());
-            $obj->setConfiguration('oid',$array[$i]['oid']);
+            $obj->setConfiguration('oid', $array[$i]['oid']);
             $obj->setType('info');
             $obj->setSubType($array[$i]['subType']);
             $obj->save();
-        
         }
 
         $this->save();

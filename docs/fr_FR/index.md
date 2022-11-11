@@ -17,12 +17,12 @@
     Pour permettre un échange entre utilisateurs du plugin, le plugin permet l'exportation/importation des commandes 
     de l'équipement.
 
-    Pour l'exporation, on spécifie le nom de fichier qui contiendra les données exportées et on clique sur le bouton
+    Pour l'exportation, on spécifie le nom de fichier qui contiendra les données exportées et on clique sur le bouton
     "Exécuter" à droite du nom.
 
     Pour l'importation, on choisit le fichier à importer et on clique sur le bouton "Exécuter" à droite de la boite déroulante.
 
     L'onglet "Commandes" contient déjà une action "Refresh" qui permettra le rafraichissement des données à la demande ainsi qu'une
-    information "Etat" qui donne le résultat du ping à l'adresse IP spécifiée dans l'équipeùment. "En ligne" ou "Hors ligne".
+    information "Etat" qui donne le résultat du ping à l'adresse IP spécifiée dans l'équipement. "En ligne" ou "Hors ligne".
 
     Il est possible d'ajouter des commandes ( seules les commandes infos seront traitées ) et de spécifier l'oid correspondant.
