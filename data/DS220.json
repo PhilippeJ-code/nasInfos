@@ -1,0 +1,62 @@
+[
+    {
+        "name": "Marque UPS",
+        "oid": "1.3.6.1.4.1.6574.4.1.1.0",
+        "subType": "string"
+    },
+    {
+        "name": "Fabriquant UPS",
+        "oid": "1.3.6.1.4.1.6574.4.1.2.0",
+        "subType": "string"
+    },
+    {
+        "name": "Pourcentage de charge UPS",
+        "oid": "1.3.6.1.4.1.6574.4.3.1.1.0",
+        "subType": "numeric"
+    },
+    {
+        "name": "Temps restant UPS",
+        "oid": "1.3.6.1.4.1.6574.4.3.6.1.0",
+        "subType": "numeric"
+    },
+    {
+        "name": "Mod\u00e8le",
+        "oid": "1.3.6.1.4.1.6574.1.5.1.0",
+        "subType": "string"
+    },
+    {
+        "name": "Temp\u00e9rature disque 0",
+        "oid": "1.3.6.1.4.1.6574.2.1.1.6.0",
+        "subType": "numeric"
+    },
+    {
+        "name": "Temp\u00e9rature disque 1",
+        "oid": "1.3.6.1.4.1.6574.2.1.1.6.1",
+        "subType": "numeric"
+    },
+    {
+        "name": "Statut UPS",
+        "oid": "1.3.6.1.4.1.6574.4.2.1.0",
+        "subType": "string"
+    },
+    {
+        "name": "Tension UPS",
+        "oid": "1.3.6.1.4.1.6574.4.4.1.1.0",
+        "subType": "numeric"
+    },
+    {
+        "name": "Statut Syst\u00e8me",
+        "oid": "1.3.6.1.4.1.6574.1.1.0",
+        "subType": "string"
+    },
+    {
+        "name": "Temp\u00e9rature Nas",
+        "oid": "1.3.6.1.4.1.6574.1.2.0",
+        "subType": "numeric"
+    },
+    {
+        "name": "Statut alimentation",
+        "oid": "1.3.6.1.4.1.6574.1.3.0",
+        "subType": "string"
+    }
+]

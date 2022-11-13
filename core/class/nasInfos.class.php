@@ -49,6 +49,13 @@ class nasInfos extends eqLogic
         $adresseIp = $this->getConfiguration('adresse_ip', '');
         $community = $this->getConfiguration('community', '');
 
+        $array = array();
+
+        $json_file = __DIR__ . '/../../data/conversions.json';
+
+        $string = file_get_contents($json_file);
+        $array = json_decode($string, true);
+
         if (($adresseIp === '') || (community === '')) {
             return;
         }
@@ -69,6 +76,31 @@ class nasInfos extends eqLogic
                     $oid = $cmd->getConfiguration('oid', '');
                     if ($oid !== '') {
                         $value = snmp2_get($adresseIp, $community, $oid, 250000, 1);
+
+                        $n = count($array);
+                        for ($i=0; $i<$n; $i++) {
+                            $oidConv = $array[$i]['oid'];
+                            $defaut = $array[$i]['defaut'];
+                            log::add('nasInfos', 'info', $defaut);
+                            if ($oid == $oidConv) {
+                                $nn = count($array[$i]['conversions']);
+
+                                $bFind = false;
+                                for ($j=0; $j<$nn; $j++) {
+                                    log::add('nasInfos', 'info', $value . ' -> ' . $array[$i]['conversions'][$j]['de']);
+
+                                    if ($value == $array[$i]['conversions'][$j]['de']) {
+                                        $value = $array[$i]['conversions'][$j]['vers'];
+                                        $bFind = true;
+                                        break;
+                                    }
+                                }
+                                if ($bFind == false) {
+                                    $value = $defaut;
+                                }
+                            }
+                        }
+
                         if ($value !== false) {
                             $cmd->event($value);
                         }
@@ -81,7 +113,7 @@ class nasInfos extends eqLogic
             log::add('nasInfos', 'error', $e->getMessage());
         }
 
-            return;
+        return;
     }
 
     public function importer($nomNas)
