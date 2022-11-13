@@ -81,14 +81,11 @@ class nasInfos extends eqLogic
                         for ($i=0; $i<$n; $i++) {
                             $oidConv = $array[$i]['oid'];
                             $defaut = $array[$i]['defaut'];
-                            log::add('nasInfos', 'info', $defaut);
                             if ($oid == $oidConv) {
                                 $nn = count($array[$i]['conversions']);
 
                                 $bFind = false;
                                 for ($j=0; $j<$nn; $j++) {
-                                    log::add('nasInfos', 'info', $value . ' -> ' . $array[$i]['conversions'][$j]['de']);
-
                                     if ($value == $array[$i]['conversions'][$j]['de']) {
                                         $value = $array[$i]['conversions'][$j]['vers'];
                                         $bFind = true;
