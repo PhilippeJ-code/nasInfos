@@ -149,6 +149,11 @@ class nasInfos extends eqLogic
     {
         $array = array();
 
+        if ($nomNas === 'conversions' )
+        {
+            return array();
+        }
+
         $json_file = __DIR__ . '/../../data/'.$nomNas.'.json';
 
         foreach ($this->getCmd('info') as $cmd) {
@@ -211,7 +216,6 @@ class nasInfos extends eqLogic
     {
         self::periodique();
     }
-
 
     // Fonction exécutée automatiquement avant la création de l'équipement
     //

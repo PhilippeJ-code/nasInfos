@@ -17,109 +17,180 @@
 
 var eqLogicId = -1;
 
-$("#table_cmd").sortable({axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true});
-/*
- * Fonction permettant l'affichage des commandes dans l'équipement
- */
+// Add command
+//
 function addCmdToTable(_cmd) {
+
+    if (document.getElementById('table_cmd') == null) return
+    if (document.querySelector('#table_cmd thead') == null) {
+      table = '<thead>'
+      table += '<tr>'
+      table += '<th>{{Id}}</th>'
+      table += '<th>{{Nom}}</th>'
+      table += '<th>{{Type}}</th>'
+      table += '<th>{{OID}}</th>'
+      table += '<th>{{Paramètres}}</th>'
+      table += '<th>{{Etat}}</th>'
+      table += '<th>{{Action}}</th>'
+      table += '</tr>'
+      table += '</thead>'
+      table += '<tbody>'
+      table += '</tbody>'
+      document.getElementById('table_cmd').insertAdjacentHTML('beforeend', table)
+    }
     if (!isset(_cmd)) {
-        var _cmd = {configuration: {}};
+      var _cmd = { configuration: {} }
     }
     if (!isset(_cmd.configuration)) {
-        _cmd.configuration = {};
+      _cmd.configuration = {}
     }
-    var tr = '<tr class="cmd" data-cmd_id="' + init(_cmd.id) + '">';
-    tr += '<td>';
-    tr += '<span class="cmdAttr" data-l1key="id" style="display:none;"></span>';
-    tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom}}">';
-    tr += '</td>';
+    var tr = ''
+    tr += '<td style="min-width:50px;width:70px;">'
+    tr += '<span class="cmdAttr" data-l1key="id"></span>'
+    tr += '</td>'
+    tr += '<td>'
+    tr += '<div class="row">'
+    tr += '<div class="col-sm-6">'
+    tr += '<a class="cmdAction btn btn-default btn-sm" data-l1key="chooseIcon"><i class="fa fa-flag"></i> Icône</a>'
+    tr += '<span class="cmdAttr" data-l1key="display" data-l2key="icon" style="margin-left : 10px;"></span>'
+    tr += '</div>'
+    tr += '<div class="col-sm-6">'
+    tr += '<input class="cmdAttr form-control input-sm" data-l1key="name">'
+    tr += '</div>'
+    tr += '</div>'
+    tr += '<select class="cmdAttr form-control input-sm" data-l1key="value" style="display : none;margin-top : 5px;" title="{{La valeur de la commande vaut par défaut la commande}}">'
+    tr += '<option value="">Aucune</option>'
+    tr += '</select>'
+    tr += '</td>'
+    tr += '<td>'
+    tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>'
+    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>'
+    tr += '</td>'
     tr += '<td>';
     if ((_cmd.logicalId!='refresh') && (_cmd.logicalId!='state')) {
         tr += '<input class="cmdAttr form-control input-sm" data-l1key="configuration"  data-l2key="oid" style="width : 200px;" placeholder="{{OID}}" title="{{OID}}" >';
     }
     tr += '</td>';
-    tr += '<td>';
-    tr += '<span class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
-    tr += '<span class="subType" subType="' + init(_cmd.subType) + '"></span>';
-    tr += '</td>';
-    tr += '<td>';
-    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> ';
-    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> ';
-    tr += '</td>';
-    tr += '<td>';
+    tr += '<td>'
+    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="minValue" placeholder="{{Min}}" title="{{Min}}" style="width:30%;display:inline-block;">'
+    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="maxValue" placeholder="{{Max}}" title="{{Max}}" style="width:30%;display:inline-block;">'
+    tr += '<input class="cmdAttr form-control input-sm" data-l1key="unite" placeholder="{{Unité}}" title="{{Unité}}" style="width:30%;display:inline-block;margin-left:2px;">'
+    tr += '<input class="tooltips cmdAttr form-control input-sm" data-l1key="configuration" data-l2key="listValue" placeholder="{{Liste de valeur|texte séparé par ;}}" title="{{Liste}}">'
+    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isVisible" checked/>{{Afficher}}</label></span> '
+    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr checkbox-inline" data-l1key="isHistorized" checked/>{{Historiser}}</label></span> '
+    tr += '<span><label class="checkbox-inline"><input type="checkbox" class="cmdAttr" data-l1key="display" data-l2key="invertBinary"/>{{Inverser}}</label></span> '
+    tr += '</td>'
+    tr += '<td>'
+    tr += '<span class="cmdAttr" data-l1key="htmlstate"></span>'
+    tr += '</td>'
+    tr += '<td>'
     if (is_numeric(_cmd.id)) {
-        tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> ';
-        tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fas fa-rss"></i> {{Tester}}</a>';
+      tr += '<a class="btn btn-default btn-xs cmdAction" data-action="configure"><i class="fas fa-cogs"></i></a> '
+      tr += '<a class="btn btn-default btn-xs cmdAction" data-action="test"><i class="fa fa-rss"></i> {{Tester}}</a>'
     }
-    tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>';
-    tr += '</td>';
-    tr += '</tr>';
-    $('#table_cmd tbody').append(tr);
-    $('#table_cmd tbody tr:last').setValues(_cmd, '.cmdAttr');
-    if (isset(_cmd.type)) {
-        $('#table_cmd tbody tr:last .cmdAttr[data-l1key=type]').value(init(_cmd.type));
-    }
-    jeedom.cmd.changeType($('#table_cmd tbody tr:last'), init(_cmd.subType));
+    tr += '<i class="fas fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i>'
+    tr += '</td>'
+
+    let newRow = document.createElement('tr')
+    newRow.innerHTML = tr
+    newRow.addClass('cmd')
+    newRow.setAttribute('data-cmd_id', init(_cmd.id))
+    document.getElementById('table_cmd').querySelector('tbody').appendChild(newRow)
+
+    jeedom.eqLogic.buildSelectCmd({
+      id: document.querySelector('.eqLogicAttr[data-l1key="id"]').jeeValue(),
+      filter: { type: 'info' },
+      error: function(error) {
+        jeedomUtils.showAlert({ message: error.message, level: 'danger' })
+      },
+        success: function(result) {
+            newRow.querySelector('.cmdAttr[data-l1key="value"]').insertAdjacentHTML('beforeend', result)
+            newRow.setJeeValues(_cmd, '.cmdAttr')
+            jeedom.cmd.changeType(newRow, init(_cmd.subType))
+        }
+    })
 }
 
 function printEqLogic(_eqLogic) {   
     eqLogicId = _eqLogic.id;
 }
 
-// Click pour importation
+// Event Import
 //
-$('#idImporter').on('click', function () {
+function eventImport()
+{
+    var e = document.getElementById("idListeNas");
+    var text = e.options[e.selectedIndex].text;
 
-    $.ajax({
+    domUtils.ajax({
         type: "POST",
         url: "plugins/nasInfos/core/ajax/nasInfos.ajax.php",
         data: {
             action: "importer",
             id: eqLogicId,
-            nomNas: $('#idListeNas option:selected').text()
+            nomNas: text
         },
         dataType: 'json',
         global: false,
-        async: false,
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
+        error: function(error) {
+            jeedomUtils.showAlert({
+                message: error.message,
+                level: 'danger'
+            })
         },
-        success: function (data) {
+        success: function(data) {
             if (data.state != 'ok') {
-                $('#div_alert').showAlert({ message: data.result, level: 'danger' });
+                jeedomUtils.showAlert({ message: data.result, level: 'danger' });
                 return;
             }
+            jeedomUtils.showAlert({
+                message: '{{Importation réussie}}',
+                level: 'success'
+            })
             location.reload();
-        },
-    });
+        }
+    })
+}
 
-});
+el = document.getElementById("idImporter");
+el.removeEventListener('click', eventImport);
+el.addEventListener('click', eventImport);
 
-// Click pour exportation
+// Event Export
 //
-$('#idExporter').on('click', function () {
-
-    $.ajax({
+function eventExport()
+{
+    domUtils.ajax({
         type: "POST",
         url: "plugins/nasInfos/core/ajax/nasInfos.ajax.php",
         data: {
             action: "exporter",
             id: eqLogicId,
-            nomNas: $('#idNomNas').val()
+            nomNas: document.getElementById("idNomNas").value
         },
         dataType: 'json',
         global: false,
-        async: false,
-        error: function (request, status, error) {
-            handleAjaxError(request, status, error);
+        error: function(error) {
+            jeedomUtils.showAlert({
+                message: error.message,
+                level: 'danger'
+            })
         },
-        success: function (data) {
+        success: function(data) {
             if (data.state != 'ok') {
-                $('#div_alert').showAlert({ message: data.result, level: 'danger' });
+                jeedomUtils.showAlert({ message: data.result, level: 'danger' });
                 return;
             }
+            jeedomUtils.showAlert({
+                message: '{{Exportation réussie}}',
+                level: 'success'
+            })
             location.reload();
-        },
-    });
+        }
+    })
+}
 
-});
+el = document.getElementById("idExporter");
+el.removeEventListener('click', eventExport);
+el.addEventListener('click', eventExport);
+
